@@ -1,3 +1,6 @@
+# Fizz Buzz in Tensorflow! 
+# see http://joelgrus.com/2016/05/23/fizz-buzz-in-tensorflow/ 
+
 import numpy as np
 import tensorflow as tf
 
