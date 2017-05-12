@@ -40,7 +40,7 @@ def build_dataset(sent):
     for i in range(1, len(data)-1) :
         cbow_pairs.append([[data[i-1], data[i+1]], data[i]])
     # skip-gram pairs
-    # (actual, the), (actual, code), (code, actual), (brown, for), ...
+    # (actual, the), (actual, code), (code, actual), ...
     len_dic = len(dictionary)
     sgp = [];
     for i in cbow_pairs:
