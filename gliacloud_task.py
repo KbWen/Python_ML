@@ -1,51 +1,47 @@
-# 1.避免多重分類或分類不均
-# 2.會導致那個神經元被拉在兩個極端點
-# 3.bias:準度，好得bias會讓預測結果高，但會造成overfitting
-#   Variance:穩定性，好的variance會讓每次的預測結果相近，會造成underfitting
-# 4.手上只有一棵樹，怎樣修剪都是一樣的分類
-# 5.用N個暫存器對N個特徵值做編碼，每個暫存器接獨立，且只有一個有效位元。
-# 6.a.再訓練時加入更多的資料。
-#   b.L1,L2 Regularization：就像是個退化模型，因為我們用w去限制他過多的變動
-#   c.dropout：每次訓練時隨機忽略部分神經元
 
-
-
-from operator import itemgetter
-
-filename = open('raw_sentences.txt','r')
-sentence =[]
-for line in filename.readlines():
-    sentence.append(line)
-for i,j in enumerate(sentence):
-    sentence[i] = j.strip('\n').split(' ')
-print(sentence)
-
-def ngram_probs(S):
-    dicts = {}
     for j in S:
         for i in j:
             dicts[i] = dicts.get(i,0)+1
     chsorted=sorted(dicts.items(), key=itemgetter(1), reverse=True)
     dicts2 = {}
-    for (i,j) in S:
-        dicts2[(i,j)]=dicts2.get((i,j),0)+1
+    for listn in S:
+        for i in range(len(listn)-1):
+             dicts2[(listn[i],listn[i+1])]= dicts2.get((listn[i],listn[i+1]),0)+1
     dicts3 = {}
-    for (i,j,k) in S:
-        dicts3[(i,j,k)]=dicrs3.get((i,j,k),0)+1
-    return (dicts2,dicts3)
-def prob3(bigram,cnt2,cnt3):
-    dicts2 = {}
-    for j in S:
-        for i in j:
-            dicts2[(i,j[i+1])]=dicts2.get((i,j[i+1]),0)+1
-    dicts3 = {}
-    for j in S:
-        for i in j:
-        dicts3[(i,j[i+1],j[i+2])]=dicrs3.get((i,j[i+1],j[i+2]),0)+1
-    bigram = sorted(dicts2.items(), key=itemgetter(1), reverse=True)
-    trigram = sorted(dicts3.items(), key=itemgetter(1), reverse=True)
-    return (dicts2,dicts3)
+    for listn in S:
+        for i in range(len(listn)-2):
+             dicts3[(listn[i],listn[i+1],listn[i+2])]=dicts3.get((listn[i],listn[i+1],listn[i+2]),0)+1
 
+    bigramsorted=sorted(dicts2.items(), key=itemgetter(1), reverse=True)
+    trigramsorted=sorted(dicts3.items(), key=itemgetter(1), reverse=True)
+    return (bigramsorted, trigramsorted)
+print(ngram_probs(sentence))
+
+# probability
+# 看了好久，還是不懂得怎麼在輸入就先給bigram and trigram 機率
+def prob3(bigram):
+    proba2_list,proba3_list = ngram_probs(sentence)
+    dicts = dict()
+    cnt2_sum = 0
+    cnt3_sum = 0
+    cnt2_num = 0
+    cnt3_num = 0
+    for i in range(len(proba2_list)):
+        cnt2_sum +=  proba2_list[i][1]
+        if proba2_list[i][0] == bigram:
+            cnt2_num += proba2_list[i][1]
+    cnt2 = cnt2_num/cnt2_sum
+    for i in range(len(proba3_list)):
+        cnt3_sum +=  proba3_list[i][1]
+        if bigram[0] == proba3_list[i][0][0] and bigram[1] == proba3_list[i][0][1]:
+            cnt3_num = proba3_list[i][1]
+            dicts[proba3_list[i][0][2]] = dicts.get(i,0)+ (cnt3_num/cnt3_sum)/cnt2
+    return(dicts)
+print(prob3(('we','are')))
+# 有邊界沒考慮到
 def predict_max(starting):
-    predic = prob3(bigram,cnt2,cnt3)
-    for
+    dicts_prob = prob3(starting)
+    gramsorted=sorted(dicts_prob.items(), key=itemgetter(1), reverse=True)
+    return gramsorted[0][0]
+
+print(predict_max(starting=('we','are')))
